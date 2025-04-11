@@ -80,7 +80,13 @@ export class BlobService {
           throw new Error('Data not found');
         }
 
-        const response = await fetch(blob.url);
+        // Use the downloadUrl instead of url to avoid CORS issues
+        const response = await fetch(blob.downloadUrl, {
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
