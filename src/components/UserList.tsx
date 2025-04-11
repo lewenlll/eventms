@@ -45,6 +45,33 @@ export const UserList: React.FC = () => {
     setIsFormOpen(true);
   };
 
+  const handleCreateTestUsers = async () => {
+    if (window.confirm('This will create 100 test users. Are you sure?')) {
+      setIsLoading(true);
+      try {
+        for (let i = 1; i <= 100; i++) {
+          const testUser: User = {
+            id: `test-${i}`,
+            name: `Test User ${i}`,
+            chineseName: `测试用户 ${i}`,
+            gender: i % 2 === 0 ? 'male' : 'female',
+            dateOfBirth: '1990-01-01',
+            email: `test${i}@example.com`,
+            phoneNumber: `12345678${i.toString().padStart(2, '0')}`,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          await BlobService.saveUser(testUser);
+        }
+        await loadUsers();
+      } catch (error) {
+        console.error('Error creating test users:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
   const handleEditUser = (user: User) => {
     setSelectedUser(user);
     setIsFormOpen(true);
@@ -60,10 +87,14 @@ export const UserList: React.FC = () => {
   };
 
   const handleSubmit = async (userData: User) => {
+    console.log('Saving user data:', userData);
     const response = await BlobService.saveUser(userData);
+    console.log('Save response:', response);
     if (response.success) {
       setIsFormOpen(false);
       await loadUsers();
+    } else {
+      console.error('Failed to save user:', response.error);
     }
   };
 
@@ -78,9 +109,14 @@ export const UserList: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Users</Typography>
-        <Button variant="contained" onClick={handleCreateUser}>
-          Create User
-        </Button>
+        <Box>
+          <Button variant="outlined" onClick={handleCreateTestUsers} sx={{ mr: 2 }}>
+            Create Test Users
+          </Button>
+          <Button variant="contained" onClick={handleCreateUser}>
+            Create User
+          </Button>
+        </Box>
       </Box>
 
       <TextField

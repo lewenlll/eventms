@@ -68,10 +68,14 @@ export const EventList: React.FC = () => {
   };
 
   const handleSubmit = async (eventData: Event) => {
+    console.log('Saving event data:', eventData);
     const response = await BlobService.saveEvent(eventData);
+    console.log('Save response:', response);
     if (response.success) {
       setIsFormOpen(false);
       await loadEvents();
+    } else {
+      console.error('Failed to save event:', response.error);
     }
   };
 

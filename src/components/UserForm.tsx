@@ -33,6 +33,14 @@ export const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) 
   const [formData, setFormData] = useState(user || initialUser);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    if (user) {
+      setFormData(user);
+    } else {
+      setFormData(initialUser);
+    }
+  }, [user]);
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -64,8 +72,9 @@ export const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) 
       id: user?.id || generateId(),
       createdAt: user?.createdAt || now,
       updatedAt: now,
-    } as User;
+    };
 
+    console.log('Submitting user data:', userData);
     onSubmit(userData);
   };
 
@@ -98,11 +107,10 @@ export const UserForm: React.FC<UserFormProps> = ({ user, onSubmit, onCancel }) 
           <Select
             value={formData.gender}
             label="Gender"
-            onChange={(e) => setFormData({ ...formData, gender: e.target.value as 'male' | 'female' | 'other' })}
+            onChange={(e) => setFormData({ ...formData, gender: e.target.value as 'male' | 'female' })}
           >
             <MenuItem value="male">Male</MenuItem>
             <MenuItem value="female">Female</MenuItem>
-            <MenuItem value="other">Other</MenuItem>
           </Select>
         </FormControl>
         <TextField
