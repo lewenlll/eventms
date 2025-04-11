@@ -3,7 +3,7 @@ import { User, Event, ApiResponse } from '../types';
 
 const BLOB_READ_WRITE_TOKEN = import.meta.env.VITE_BLOB_READ_WRITE_TOKEN;
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-const IS_DEVELOPMENT = import.meta.env.DEV;
+const IS_DEVELOPMENT = import.meta.env.VITE_IS_DEV === 'true';
 
 if (!IS_DEVELOPMENT && !BLOB_READ_WRITE_TOKEN) {
   console.error('VITE_BLOB_READ_WRITE_TOKEN is not defined in production environment');
@@ -80,9 +80,8 @@ export class BlobService {
           throw new Error('Data not found');
         }
 
-        // Use the downloadUrl instead of url to avoid CORS issues
-        const response = await fetch(blob.downloadUrl, {
-          mode: 'no-cors',
+        // Use the url instead of url to avoid CORS issues
+        const response = await fetch(blob.url, {
           headers: {
             'Accept': 'application/json',
           },
