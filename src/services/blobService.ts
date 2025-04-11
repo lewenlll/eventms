@@ -1,9 +1,13 @@
 import { put, del, list } from '@vercel/blob';
 import { User, Event, ApiResponse } from '../types';
 
-const BLOB_READ_WRITE_TOKEN = import.meta.env.BLOB_READ_WRITE_TOKEN;
+const BLOB_READ_WRITE_TOKEN = import.meta.env.VITE_BLOB_READ_WRITE_TOKEN;
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 const IS_DEVELOPMENT = import.meta.env.DEV;
+
+if (!IS_DEVELOPMENT && !BLOB_READ_WRITE_TOKEN) {
+  console.error('VITE_BLOB_READ_WRITE_TOKEN is not defined in production environment');
+}
 
 export class BlobService {
   private static async saveData<T>(key: string, data: T): Promise<ApiResponse<T>> {
@@ -24,6 +28,9 @@ export class BlobService {
         
         return { success: true, data };
       } else {
+        if (!BLOB_READ_WRITE_TOKEN) {
+          throw new Error('BLOB_READ_WRITE_TOKEN is not defined');
+        }
         const blob = await put(key, JSON.stringify(data), {
           access: 'public',
           token: BLOB_READ_WRITE_TOKEN,
@@ -55,6 +62,9 @@ export class BlobService {
         const data = await response.json();
         return { success: true, data };
       } else {
+        if (!BLOB_READ_WRITE_TOKEN) {
+          throw new Error('BLOB_READ_WRITE_TOKEN is not defined');
+        }
         const { blobs } = await list({ 
           token: BLOB_READ_WRITE_TOKEN,
           prefix: key
